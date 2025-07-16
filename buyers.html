@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>All Buyers</title>
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #444;
+      text-align: left;
+    }
+    th {
+      background: #222;
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    .total-count {
+      margin-top: 10px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Ticket Buyers</h1>
+  <div class="total-count" id="total-count">Total Buyers: 0</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Student</th>
+        <th>Non-Student</th>
+        <th>Pastor</th>
+        <th>Total Paid</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody id="buyer-list"></tbody>
+  </table>
+
+  <script>
+    const buyers = JSON.parse(localStorage.getItem("buyers") || "[]");
+    const buyerList = document.getElementById("buyer-list");
+
+    buyers.forEach(buyer => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${buyer.name}</td>
+        <td>${buyer.email}</td>
+        <td>${buyer.student}</td>
+        <td>${buyer.nonstudent}</td>
+        <td>${buyer.pastor}</td>
+        <td>₱${buyer.total}</td>
+        <td>${buyer.timestamp}</td>
+      `;
+      buyerList.appendChild(row);
+    });
+
+    document.getElementById("total-count").innerText = "Total Buyers: " + buyers.length;
+  </script>
+</body>
+</html>
