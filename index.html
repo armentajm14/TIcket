@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tickets</title>
+  <style>
+    body {
+      font-family: 'Arial Black', sans-serif;
+      background-color: #000;
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .container, .payment {
+      max-width: 400px;
+      margin: auto;
+      background-color: #111;
+      border-radius: 15px;
+      padding: 20px;
+      display: block;
+    }
+
+    .payment {
+      display: none;
+    }
+
+    h1 {
+      font-size: 36px;
+      letter-spacing: 3px;
+      margin-bottom: 20px;
+    }
+
+    .ticket-type {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #222;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 15px;
+    }
+
+    .ticket-info {
+      text-align: left;
+    }
+
+    .ticket-price {
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    .counter {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    button {
+      background-color: #444;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      font-size: 18px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #get-tickets {
+      margin-top: 20px;
+      background-color: #333;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 18px;
+    }
+
+    input {
+      padding: 10px;
+      border-radius: 8px;
+      width: 90%;
+      border: none;
+      margin-bottom: 15px;
+    }
+
+    img.qr {
+      width: 100%;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
+    a.link {
+      color: #00f0ff;
+      display: inline-block;
+      margin-top: 15px;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ticket Selection View -->
+  <div class="container" id="ticket-container">
+    <h1>TICKETS</h1>
+
+    <div class="ticket-type">
+      <div class="ticket-info">
+        <div>STUDENT</div>
+        <div class="ticket-price">₱150.00</div>
+      </div>
+      <div class="counter">
+        <button onclick="changeCount('student', -1)">-</button>
+        <span id="student-count">0</span>
+        <button onclick="changeCount('student', 1)">+</button>
+      </div>
+    </div>
+
+    <div class="ticket-type">
+      <div class="ticket-info">
+        <div>NON-STUDENT</div>
+        <div class="ticket-price">₱250.00<br><small>Including youth/young adult leaders</small></div>
+      </div>
+      <div class="counter">
+        <button onclick="changeCount('nonstudent', -1)">-</button>
+        <span id="nonstudent-count">0</span>
+        <button onclick="changeCount('nonstudent', 1)">+</button>
+      </div>
+    </div>
+
+    <div class="ticket-type">
+      <div class="ticket-info">
+        <div>YOUTH/YA PASTOR</div>
+        <div class="ticket-price">₱0.00<br><small>or ministry head</small></div>
+      </div>
+      <div class="counter">
+        <button onclick="changeCount('pastor', -1)">-</button>
+        <span id="pastor-count">0</span>
+        <button onclick="changeCount('pastor', 1)">+</button>
+      </div>
+    </div>
+
+    <button id="get-tickets" onclick="goToPayment()">GET TICKETS</button>
+  </div>
+
+  <!-- Payment View -->
+  <div class="payment" id="payment-container">
+    <h1>PAYMENT</h1>
+    <p>Total Amount: <strong id="total-amount">₱0</strong></p>
+
+    <input type="text" placeholder="Full Name" required><br>
+    <input type="email" placeholder="Email Address" required><br>
+    <input type="file" id="proofFile" accept="image/*"><br><br>
+    <button onclick="uploadToDrive()">Upload to Google Drive</button><br><br>
+    
+
+    <!-- Inserted QR Code Image -->
+    <img src="Payment.jpg" alt="Payment QR Codes" class="qr">
+    <b>
+       <!-- Submit Button -->
+  <button onclick="finishPayment()">Submit</button>
+  </div>
+
+
+  <script>
+    const prices = {
+      student: 150,
+      nonstudent: 250,
+      pastor: 0
+    };
+
+    const counts = {
+      student: 0,
+      nonstudent: 0,
+      pastor: 0
+    };
+
+    function changeCount(type, value) {
+      counts[type] += value;
+      if (counts[type] < 0) counts[type] = 0;
+      document.getElementById(`${type}-count`).innerText = counts[type];
+    }
+
+    function goToPayment() {
+      const total = counts.student * prices.student + counts.nonstudent * prices.nonstudent;
+      if (total === 0 && counts.pastor === 0) {
+        alert("Please select at least one ticket.");
+        return;
+      }
+
+      document.getElementById("total-amount").innerText = `₱${total}`;
+      document.getElementById("ticket-container").style.display = "none";
+      document.getElementById("payment-container").style.display = "block";
+    }
+
+    function finishPayment() {
+  const name = document.querySelector('input[placeholder="Full Name"]').value.trim();
+  const email = document.querySelector('input[placeholder="Email Address"]').value.trim();
+  const file = document.getElementById("payment-proof").files[0];
+
+  if (name === "" || email === "" || !file) {
+    alert("Please enter your full name, email, and upload proof of payment.");
+    return;
+  }
+
+  const totalAmount = counts.student * prices.student + counts.nonstudent * prices.nonstudent;
+
+  const buyer = {
+    name,
+    email,
+    student: counts.student,
+    nonstudent: counts.nonstudent,
+    pastor: counts.pastor,
+    total: totalAmount,
+    timestamp: new Date().toLocaleString(),
+    proofFilename: file.name
+  };
+
+  const existing = JSON.parse(localStorage.getItem("buyers") || "[]");
+  existing.push(buyer);
+  localStorage.setItem("buyers", JSON.stringify(existing));
+
+  alert("Thank you! Your ticket has been recorded.");
+  window.location.href = "buyers.html"; // redirect to buyer list
+}
+
+  </script>
+
+  <script>
+  async function uploadToDrive() {
+    const fileInput = document.getElementById("proofFile");
+    const file = fileInput.files[0];
+    if (!file) {
+      alert("Please select a file to upload.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = async function () {
+      const base64 = reader.result.split(',')[1]; // Remove data:image/... prefix
+      const formData = new URLSearchParams();
+      formData.append("filedata", base64);
+      formData.append("filename", file.name);
+      formData.append("mimetype", file.type);
+      formData.append("fullname", document.querySelector('input[placeholder="Full Name"]').value);
+      formData.append("email", document.querySelector('input[placeholder="Email Address"]').value);
+
+      const response = await fetch("https://script.google.com/macros/s/AKfycbx62WUevT5VPUG45hmsVVcqnw7QYnD85b4mLp7DUMHql8ugWIm3NYlrUWXxkb-ecmINRw/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formData
+      });
+
+      const text = await response.text();
+      alert("Upload result: " + text);
+    };
+
+    reader.readAsDataURL(file);
+  }
+</script>
+
+</body>
+</html>
