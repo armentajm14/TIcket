@@ -245,7 +245,7 @@
       formData.append("fullname", document.querySelector('input[placeholder="Full Name"]').value);
       formData.append("email", document.querySelector('input[placeholder="Email Address"]').value);
 
-      const response = await fetch("https://script.google.com/macros/library/d/1HBokNXkdDWHZGMKewvv1hauqEe4950gANI3CwXa61EWXeTUfBJvu9EW3/1", {
+      const response = await fetch("https://script.google.com/macros/s/AKfycbx62WUevT5VPUG45hmsVVcqnw7QYnD85b4mLp7DUMHql8ugWIm3NYlrUWXxkb-ecmINRw/exec", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: formData
